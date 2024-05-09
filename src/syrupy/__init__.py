@@ -146,14 +146,15 @@ def pytest_collection_finish(session: Any) -> None:
     session.config._syrupy.select_items(session.items)
 
 
-def pytest_runtest_logfinish(nodeid: str) -> None:
+def pytest_runtest_logreport(report: pytest.TestReport) -> None:
     """
-    At the end of running the runtest protocol for a single item.
-    https://docs.pytest.org/en/latest/reference.html#_pytest.hookspec.pytest_runtest_logfinish
+    After each of the setup, call and teardown runtest phases of an item.
+    https://docs.pytest.org/en/8.0.x/reference/reference.html#pytest.hookspec.pytest_runtest_logreport
     """
     global _syrupy
-    if _syrupy:
-        _syrupy.ran_item(nodeid)
+    # The outcome will be passed in the teardown phase even if skipped
+    if _syrupy and report.when != "teardown":
+        _syrupy.ran_item(report.nodeid, report.outcome)
 
 
 @pytest.hookimpl(tryfirst=True)

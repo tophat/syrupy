@@ -46,6 +46,7 @@ if TYPE_CHECKING:
     import pytest
 
     from .assertion import SnapshotAssertion
+    from .session import ItemStatus
 
 
 @dataclass
@@ -59,7 +60,7 @@ class SnapshotReport:
     # Initial arguments to the report
     base_dir: Path
     collected_items: Set["pytest.Item"]
-    selected_items: Dict[str, bool]
+    selected_items: Dict[str, "ItemStatus"]
     options: "argparse.Namespace"
     assertions: List["SnapshotAssertion"]
 
@@ -197,6 +198,14 @@ class SnapshotReport:
         return self._collected_items_by_nodeid.keys() == self.selected_items.keys()
 
     @property
+    def skipped_items(self) -> Iterator["pytest.Item"]:
+        return (
+            self._collected_items_by_nodeid[nodeid]
+            for nodeid in self.selected_items
+            if self.selected_items[nodeid].value == "skipped"
+        )
+
+    @property
     def ran_items(self) -> Iterator["pytest.Item"]:
         return (
             self._collected_items_by_nodeid[nodeid]
@@ -230,7 +239,13 @@ class SnapshotReport:
             if self.selected_all_collected_items and not any(provided_nodes):
                 # All collected tests were run and files were not filtered by ::node
                 # therefore the snapshot collection file at this location can be deleted
-                unused_snapshots = {*unused_snapshot_collection}
+                unused_snapshots = {
+                    snapshot
+                    for snapshot in unused_snapshot_collection
+                    if not self._skipped_items_match_name(
+                        snapshot_location=snapshot_location, snapshot_name=snapshot.name
+                    )
+                }
                 mark_for_removal = snapshot_location not in self.used
             else:
                 unused_snapshots = {
@@ -243,6 +258,9 @@ class SnapshotReport:
                         snapshot_location=snapshot_location,
                         snapshot_name=snapshot.name,
                         provided_nodes=provided_nodes,
+                    )
+                    and not self._skipped_items_match_name(
+                        snapshot_location=snapshot_location, snapshot_name=snapshot.name
                     )
                 }
                 mark_for_removal = False
@@ -444,6 +462,21 @@ class SnapshotReport:
         Check that a snapshot name would match a test node using the Pytest location
         """
         for item in self.ran_items:
+            location = PyTestLocation(item)
+            if location.matches_snapshot_location(
+                snapshot_location
+            ) and location.matches_snapshot_name(snapshot_name):
+                return True
+        return False
+
+    def _skipped_items_match_name(
+        self, snapshot_location: str, snapshot_name: str
+    ) -> bool:
+        """
+        Check that a snapshot name should be treated as skipped by the current session
+        This being true means that it will not be deleted even if the it is unused
+        """
+        for item in self.skipped_items:
             location = PyTestLocation(item)
             if location.matches_snapshot_location(
                 snapshot_location

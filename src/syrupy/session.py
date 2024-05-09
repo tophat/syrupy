@@ -3,6 +3,7 @@ from dataclasses import (
     dataclass,
     field,
 )
+from enum import Enum
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -11,6 +12,7 @@ from typing import (
     Dict,
     Iterable,
     List,
+    Literal,
     Optional,
     Set,
     Tuple,
@@ -37,6 +39,13 @@ if TYPE_CHECKING:
     from .extensions.base import AbstractSyrupyExtension
 
 
+class ItemStatus(Enum):
+    NOT_RUN = False
+    PASSED = "passed"
+    FAILED = "failed"
+    SKIPPED = "skipped"
+
+
 @dataclass
 class SnapshotSession:
     pytest_session: "pytest.Session"
@@ -45,7 +54,7 @@ class SnapshotSession:
     # All the collected test items
     _collected_items: Set["pytest.Item"] = field(default_factory=set)
     # All the selected test items. Will be set to False until the test item is run.
-    _selected_items: Dict[str, bool] = field(default_factory=dict)
+    _selected_items: Dict[str, ItemStatus] = field(default_factory=dict)
     _assertions: List["SnapshotAssertion"] = field(default_factory=list)
     _extensions: Dict[str, "AbstractSyrupyExtension"] = field(default_factory=dict)
 
@@ -97,7 +106,9 @@ class SnapshotSession:
 
     def select_items(self, items: List["pytest.Item"]) -> None:
         for item in self.filter_valid_items(items):
-            self._selected_items[getattr(item, "nodeid")] = False  # noqa: B009
+            self._selected_items[getattr(item, "nodeid")] = (  # noqa: B009
+                ItemStatus.NOT_RUN
+            )
 
     def start(self) -> None:
         self.report = None
@@ -107,9 +118,11 @@ class SnapshotSession:
         self._extensions = {}
         self._locations_discovered = defaultdict(set)
 
-    def ran_item(self, nodeid: str) -> None:
+    def ran_item(
+        self, nodeid: str, outcome: Literal["passed", "skipped", "failed"]
+    ) -> None:
         if nodeid in self._selected_items:
-            self._selected_items[nodeid] = True
+            self._selected_items[nodeid] = ItemStatus(outcome)
 
     def finish(self) -> int:
         exitstatus = 0
