@@ -52,7 +52,7 @@ def generate_snapshots(testdir, testcases):
 
 def test_generated_snapshots(generate_snapshots):
     result = generate_snapshots[0]
-    result.stdout.re_match_lines((r"2 snapshots generated\."))
+    result.stdout.re_match_lines(r"2 snapshots generated\.")
     assert "snapshots unused" not in result.stdout.str()
     assert result.ret == 0
 
@@ -61,7 +61,7 @@ def test_unmatched_snapshots(generate_snapshots):
     _, testdir, testcases = generate_snapshots
     testdir.makepyfile(test_file=testcases["one"])
     result = testdir.runpytest("-v")
-    result.stdout.re_match_lines((r"1 snapshot passed. 1 snapshot unused\."))
+    result.stdout.re_match_lines(r"1 snapshot passed. 1 snapshot unused\.")
     assert result.ret == 1
 
 

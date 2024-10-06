@@ -23,7 +23,7 @@ def test_snapshot_default_extension_option_success(testfile):
         "--snapshot-default-extension",
         "syrupy.extensions.single_file.SingleFileSnapshotExtension",
     )
-    result.stdout.re_match_lines((r"1 snapshot generated\."))
+    result.stdout.re_match_lines(r"1 snapshot generated\.")
     assert Path(
         testfile.tmpdir, "__snapshots__", "test_file", "test_default.raw"
     ).exists()

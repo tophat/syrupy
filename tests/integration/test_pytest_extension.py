@@ -24,7 +24,7 @@ def test_ignores_non_function_nodes(testdir):
     testdir.makeconftest(conftest)
     testdir.makepyfile(test_file=testcase)
     result = testdir.runpytest("test_file.py", "-v", "--snapshot-update")
-    result.stdout.re_match_lines((r".*test_file.py::CUSTOM.*"))
+    result.stdout.re_match_lines(r".*test_file.py::CUSTOM.*")
     assert result.ret == 0
 
 
@@ -56,7 +56,7 @@ def test_does_not_print_empty_snapshot_report(testdir):
     )
 
     result = testdir.runpytest("-v", "test_file_no.py", "--snapshot-update")
-    result.stdout.re_match_lines((r".*test_file_no.py.*"))
+    result.stdout.re_match_lines(r".*test_file_no.py.*")
     assert "snapshot report" not in result.stdout.str()
     assert "test_file_yes" not in result.stdout.str()
     assert result.ret == 0

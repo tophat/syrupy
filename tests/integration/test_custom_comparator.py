@@ -51,7 +51,7 @@ def generate_snapshots(testdir, testcases_initial):
 @pytest.mark.xfail(strict=False)
 def test_generated_snapshots(generate_snapshots):
     result = generate_snapshots[0]
-    result.stdout.re_match_lines((r"1 snapshot generated\."))
+    result.stdout.re_match_lines(r"1 snapshot generated\.")
     assert "snapshots unused" not in result.stdout.str()
     assert result.ret == 0
 
@@ -66,7 +66,7 @@ def test_approximate_match(generate_snapshots):
             """
     )
     result = testdir.runpytest("-v")
-    result.stdout.re_match_lines((r"test_file.py::test_passed_custom PASSED"))
+    result.stdout.re_match_lines(r"test_file.py::test_passed_custom PASSED")
     assert result.ret == 0
 
 
@@ -75,7 +75,7 @@ def test_failed_snapshots(generate_snapshots):
     testdir = generate_snapshots[1]
     testdir.makepyfile(test_file=generate_snapshots[2]["failed"])
     result = testdir.runpytest("-v")
-    result.stdout.re_match_lines((r"1 snapshot failed\."))
+    result.stdout.re_match_lines(r"1 snapshot failed\.")
     assert result.ret == 1
 
 
@@ -84,5 +84,5 @@ def test_updated_snapshots(generate_snapshots):
     _, testdir, initial = generate_snapshots
     testdir.makepyfile(test_file=initial["failed"])
     result = testdir.runpytest("-v", "--snapshot-update")
-    result.stdout.re_match_lines((r"1 snapshot updated\."))
+    result.stdout.re_match_lines(r"1 snapshot updated\.")
     assert result.ret == 0

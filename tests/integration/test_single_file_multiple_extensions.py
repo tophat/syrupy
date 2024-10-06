@@ -22,7 +22,7 @@ def test_multiple_file_extensions(testdir):
     test_file: Path = testdir.makepyfile(test_file=testcase)
 
     result = testdir.runpytest("-v", "--snapshot-update")
-    result.stdout.re_match_lines((r"1 snapshot generated\."))
+    result.stdout.re_match_lines(r"1 snapshot generated\.")
     assert "snapshots unused" not in result.stdout.str()
     assert result.ret == 0
 
@@ -35,7 +35,7 @@ def test_multiple_file_extensions(testdir):
     assert snapshot_file.exists()
 
     result = testdir.runpytest("-v")
-    result.stdout.re_match_lines((r"1 snapshot passed\."))
+    result.stdout.re_match_lines(r"1 snapshot passed\.")
     assert "snapshots unused" not in result.stdout.str()
     assert result.ret == 0
 
@@ -61,7 +61,7 @@ def test_class_style(testdir):
     test_file: Path = testdir.makepyfile(test_file=testcase)
 
     result = testdir.runpytest("-v", "--snapshot-update")
-    result.stdout.re_match_lines((r"1 snapshot generated\."))
+    result.stdout.re_match_lines(r"1 snapshot generated\.")
     assert "deleted" not in result.stdout.str()
     assert result.ret == 0
 
@@ -71,6 +71,6 @@ def test_class_style(testdir):
     assert snapshot_file.exists()
 
     result = testdir.runpytest("-v")
-    result.stdout.re_match_lines((r"1 snapshot passed\."))
+    result.stdout.re_match_lines(r"1 snapshot passed\.")
     assert "snapshots unused" not in result.stdout.str()
     assert result.ret == 0

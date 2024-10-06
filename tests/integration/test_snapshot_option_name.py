@@ -28,7 +28,7 @@ def run_testcases(testdir, testcases):
         "-v",
         "--snapshot-update",
     )
-    result.stdout.re_match_lines((r"2 snapshots generated\."))
+    result.stdout.re_match_lines(r"2 snapshots generated\.")
     return testdir, testcases
 
 

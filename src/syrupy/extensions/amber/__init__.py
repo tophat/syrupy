@@ -51,7 +51,7 @@ class AmberSnapshotExtension(AbstractSyrupyExtension):
         return self.serializer_class.read_file(snapshot_location)
 
     @classmethod
-    @lru_cache()
+    @lru_cache
     def __cacheable_read_snapshot(
         cls, snapshot_location: str, cache_key: str
     ) -> "SnapshotCollection":

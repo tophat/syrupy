@@ -32,7 +32,7 @@ def run_testcases(testdir, testcases):
         test_1=pyfile_content, test_2=pyfile_content, test_1_with_suffix=pyfile_content
     )
     result = testdir.runpytest("-v", "--snapshot-update")
-    result.stdout.re_match_lines((r"9 snapshots generated\."))
+    result.stdout.re_match_lines(r"9 snapshots generated\.")
     return testdir, testcases
 
 

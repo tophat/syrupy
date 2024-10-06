@@ -12,10 +12,10 @@ def install(ctx, upgrade=False):
     Install dependencies and update lock file.
     """
     if upgrade:
-        ctx_run(ctx, f"poetry update")
+        ctx_run(ctx, "poetry update")
     else:
-        ctx_run(ctx, f"poetry lock")
-        ctx_run(ctx, f"poetry install")
+        ctx_run(ctx, "poetry lock")
+        ctx_run(ctx, "poetry install")
 
 
 @task

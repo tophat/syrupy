@@ -37,7 +37,7 @@ def run_testcases(testdir, testcases):
         "--snapshot-default-extension",
         "syrupy.extensions.single_file.SingleFileSnapshotExtension",
     )
-    result.stdout.re_match_lines((r"9 snapshots generated\."))
+    result.stdout.re_match_lines(r"9 snapshots generated\.")
     return testdir, testcases
 
 

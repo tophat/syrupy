@@ -1,4 +1,3 @@
-import os
 
 from invoke import task
 

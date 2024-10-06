@@ -139,7 +139,7 @@ class AmberDataSerializer:
         missing_version = True
 
         try:
-            with open(filepath, "r", encoding=TEXT_ENCODING, newline=None) as f:
+            with open(filepath, encoding=TEXT_ENCODING, newline=None) as f:
                 for line_no, line in enumerate(f):
                     if line.startswith(cls._marker_prefix):
                         marker_key, *marker_rest = line[marker_offset:].split(

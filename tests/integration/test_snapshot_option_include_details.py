@@ -47,7 +47,7 @@ def run_testfiles_with_update(testdir):
             }
         )
         result = testdir.runpytest("-v", "--snapshot-update")
-        result.stdout.re_match_lines((r"[0-9]+ snapshots generated\."))
+        result.stdout.re_match_lines(r"[0-9]+ snapshots generated\.")
         return testdir
 
     return run_testfiles_with_update_impl

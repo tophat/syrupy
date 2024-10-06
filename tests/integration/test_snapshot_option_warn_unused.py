@@ -24,7 +24,7 @@ def run_testcases(testdir, testcases):
     pyfile_content = "\n\n".join(testcases.values())
     testdir.makepyfile(test_file=pyfile_content)
     result = testdir.runpytest("-v", "--snapshot-update")
-    result.stdout.re_match_lines((r"2 snapshots generated\."))
+    result.stdout.re_match_lines(r"2 snapshots generated\.")
     return testdir, testcases
 
 
