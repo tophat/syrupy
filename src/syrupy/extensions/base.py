@@ -8,6 +8,7 @@ from itertools import zip_longest
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
+    Any,
     Callable,
     Dict,
     Iterator,
@@ -67,6 +68,7 @@ class SnapshotSerializer(ABC):
         exclude: Optional["PropertyFilter"] = None,
         include: Optional["PropertyFilter"] = None,
         matcher: Optional["PropertyMatcher"] = None,
+        **kwargs: Any,
     ) -> "SerializedData":
         """
         Serializes a python object / data structure into a string
@@ -108,7 +110,7 @@ class SnapshotCollectionStorage(ABC):
         return location.endswith(self._file_extension)
 
     def discover_snapshots(
-        self, *, test_location: "PyTestLocation"
+        self, *, test_location: "PyTestLocation", **kwargs: Any
     ) -> "SnapshotCollections":
         """
         Returns all snapshot collections in test site
@@ -117,7 +119,7 @@ class SnapshotCollectionStorage(ABC):
         for filepath in walk_snapshot_dir(self.dirname(test_location=test_location)):
             if self.is_snapshot_location(location=filepath):
                 snapshot_collection = self._read_snapshot_collection(
-                    snapshot_location=filepath
+                    snapshot_location=filepath, **kwargs
                 )
                 if not snapshot_collection.has_snapshots:
                     snapshot_collection = SnapshotEmptyCollection(location=filepath)
@@ -134,6 +136,7 @@ class SnapshotCollectionStorage(ABC):
         test_location: "PyTestLocation",
         index: "SnapshotIndex",
         session_id: str,
+        **kwargs: Any,
     ) -> "SerializedData":
         """
         This method is _final_, do not override. You can override
@@ -145,6 +148,7 @@ class SnapshotCollectionStorage(ABC):
             snapshot_location=snapshot_location,
             snapshot_name=snapshot_name,
             session_id=session_id,
+            **kwargs,
         )
         if snapshot_data is None:
             raise SnapshotDoesNotExist()
@@ -216,7 +220,7 @@ class SnapshotCollectionStorage(ABC):
 
     @abstractmethod
     def _read_snapshot_collection(
-        self, *, snapshot_location: str
+        self, *, snapshot_location: str, **kwargs: Any
     ) -> "SnapshotCollection":
         """
         Read the snapshot location and construct a snapshot collection object
@@ -225,7 +229,12 @@ class SnapshotCollectionStorage(ABC):
 
     @abstractmethod
     def _read_snapshot_data_from_location(
-        self, *, snapshot_location: str, snapshot_name: str, session_id: str
+        self,
+        *,
+        snapshot_location: str,
+        snapshot_name: str,
+        session_id: str,
+        **kwargs: Any,
     ) -> Optional["SerializedData"]:
         """
         Get only the snapshot data from location for assertion
@@ -235,7 +244,7 @@ class SnapshotCollectionStorage(ABC):
     @classmethod
     @abstractmethod
     def _write_snapshot_collection(
-        cls, *, snapshot_collection: "SnapshotCollection"
+        cls, *, snapshot_collection: "SnapshotCollection", **kwargs: Any
     ) -> None:
         """
         Adds the snapshot data to the snapshots in collection location
@@ -243,7 +252,7 @@ class SnapshotCollectionStorage(ABC):
         raise NotImplementedError
 
     @classmethod
-    def dirname(cls, *, test_location: "PyTestLocation") -> str:
+    def dirname(cls, *, test_location: "PyTestLocation", **kwargs: Any) -> str:
         test_dir = Path(test_location.filepath).parent
         return str(test_dir.joinpath(SNAPSHOT_DIRNAME))
 
@@ -259,7 +268,10 @@ class SnapshotReporter(ABC):
     _context_line_count = 1
 
     def diff_snapshots(
-        self, serialized_data: "SerializedData", snapshot_data: "SerializedData"
+        self,
+        serialized_data: "SerializedData",
+        snapshot_data: "SerializedData",
+        **kwargs: Any,
     ) -> "SerializedData":
         env = {DISABLE_COLOR_ENV_VAR: "true"}
         attrs = {"_context_line_count": 0}
@@ -267,7 +279,10 @@ class SnapshotReporter(ABC):
             return "\n".join(self.diff_lines(serialized_data, snapshot_data))
 
     def diff_lines(
-        self, serialized_data: "SerializedData", snapshot_data: "SerializedData"
+        self,
+        serialized_data: "SerializedData",
+        snapshot_data: "SerializedData",
+        **kwargs: Any,
     ) -> Iterator[str]:
         for line in self.__diff_lines(str(snapshot_data), str(serialized_data)):
             yield reset(line)
@@ -407,6 +422,7 @@ class SnapshotComparator:
         *,
         serialized_data: "SerializableData",
         snapshot_data: "SerializableData",
+        **kwargs: Any,
     ) -> bool:
         """
         Compares serialized data and snapshot data and returns

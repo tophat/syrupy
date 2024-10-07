@@ -3,6 +3,7 @@ from gettext import gettext
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
+    Any,
     Optional,
     Set,
     Type,
@@ -49,6 +50,7 @@ class SingleFileSnapshotExtension(AbstractSyrupyExtension):
         exclude: Optional["PropertyFilter"] = None,
         include: Optional["PropertyFilter"] = None,
         matcher: Optional["PropertyMatcher"] = None,
+        **kwargs: Any,
     ) -> "SerializedData":
         return self.get_supported_dataclass()(data)
 
@@ -74,12 +76,15 @@ class SingleFileSnapshotExtension(AbstractSyrupyExtension):
         return cls.get_snapshot_name(test_location=test_location, index=index)
 
     @classmethod
-    def dirname(cls, *, test_location: "PyTestLocation") -> str:
+    def dirname(cls, *, test_location: "PyTestLocation", **kwargs: Any) -> str:
         original_dirname = AbstractSyrupyExtension.dirname(test_location=test_location)
         return str(Path(original_dirname).joinpath(test_location.basename))
 
     def _read_snapshot_collection(
-        self, *, snapshot_location: str
+        self,
+        *,
+        snapshot_location: str,
+        **kwargs: Any,
     ) -> "SnapshotCollection":
         file_ext_len = len(self._file_extension) + 1 if self._file_extension else 0
         filename_wo_ext = snapshot_location[:-file_ext_len]
@@ -116,7 +121,10 @@ class SingleFileSnapshotExtension(AbstractSyrupyExtension):
 
     @classmethod
     def _write_snapshot_collection(
-        cls, *, snapshot_collection: "SnapshotCollection"
+        cls,
+        *,
+        snapshot_collection: "SnapshotCollection",
+        **kwargs: Any,
     ) -> None:
         filepath, data = (
             snapshot_collection.location,
