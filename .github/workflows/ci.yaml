@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.1
       - name: Setup Environment
         uses: ./.github/actions/setup-env
       - name: Install project dependencies
@@ -43,7 +43,7 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13-dev']
       fail-fast: true
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.1
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         with:
@@ -99,7 +99,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.1
       - name: Setup Environment
         uses: ./.github/actions/setup-env
       - name: Install project dependencies
